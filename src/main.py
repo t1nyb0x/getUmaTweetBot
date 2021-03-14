@@ -1,15 +1,16 @@
 import discord
 from discord.ext import commands
 from config import token
-import functions
+from umafunc import uma_tweet
 
-CK = token.API_KEY
-CSK = token.API_SECRET_KEY
-AT = token.ACCESS_TOKEN
-AST = token.ACCESS_SECRET_TOKEN
+# CK = token.API_KEY
+# CSK = token.API_SECRET_KEY
+# AT = token.ACCESS_TOKEN
+# AST = token.ACCESS_SECRET_TOKEN
 UMA = token.UMA_MUSU_TWITTERID
 TOKEN = token.DISCORD_TOKEN
-prefix = '?uma'
+BEARER = token.BEARER
+prefix = '?uma '
 
 
 class HelpCommand(commands.DefaultHelpCommand):
@@ -19,26 +20,25 @@ class HelpCommand(commands.DefaultHelpCommand):
         # self.no_category = 'その他'
         # self.command_attrs['help'] = ""
 
+
 class Uma(commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
 
-
     def subscribeUma(self):
         """
         ウマ娘公式のツイートを監視する
         """
-        
-        twitter = functions.twitter.Twitter(CK, CSK, AT, AST, UMA)
-        twitter.startStream()
-        return
+        twitter = uma_tweet.GetTweet(bearer=BEARER, uma=UMA)
+        uma_tweets = twitter.get_uma_twi(limit='10')
+        res = "\n".join(uma_tweets)
+        return res
 
     @commands.command()
     async def startSubscribe(self, ctx):
-        print('ok')
-        self.subscribeUma()
-        await ctx.send('@uma_musuのツイート監視を始めます')
+        res = self.subscribeUma()
+        await ctx.send(res)
 
 
 bot = commands.Bot(command_prefix=prefix,
