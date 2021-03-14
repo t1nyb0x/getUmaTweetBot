@@ -1,5 +1,4 @@
 import asyncio
-import discord
 from discord.ext import commands
 from config import token
 from umafunc import uma_tweet
