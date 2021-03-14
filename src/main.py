@@ -67,7 +67,7 @@ class Uma(commands.Cog):
         """
         user_id = ctx.message.author.id
         if str(user_id) in admin_id:
-            os.exit(os.getpid(), signal.SIGTERM)
+            os.kill(os.getpid(), signal.SIGTERM)
             await ctx.send('ウマ娘公式ツイート取得定期実行を停止します\n')
         else:
             await ctx.send('管理者以外からの実行はできません')
