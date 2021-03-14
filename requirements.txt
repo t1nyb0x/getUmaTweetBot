@@ -1,2 +1,4 @@
-tweepy
+discord.py
 python-dotenv
+schedule
+requests

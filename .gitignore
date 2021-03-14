@@ -2,3 +2,4 @@
 .DS_Store
 __pycache__/
 src/config/.env
+src/tweetdata
