@@ -1,16 +1,16 @@
+import asyncio
 import discord
 from discord.ext import commands
 from config import token
 from umafunc import uma_tweet
+import schedule
+import os, signal, time
 
-# CK = token.API_KEY
-# CSK = token.API_SECRET_KEY
-# AT = token.ACCESS_TOKEN
-# AST = token.ACCESS_SECRET_TOKEN
 UMA = token.UMA_MUSU_TWITTERID
 TOKEN = token.DISCORD_TOKEN
 BEARER = token.BEARER
 prefix = '?uma '
+admin_id = [token.HAL, token.NAKAKOMA]
 
 
 class HelpCommand(commands.DefaultHelpCommand):
@@ -35,10 +35,45 @@ class Uma(commands.Cog):
         res = "\n".join(uma_tweets)
         return res
 
-    @commands.command()
-    async def startSubscribe(self, ctx):
+    async def startSchedule(self, ctx):
+        """
+        スケジュール実行されるメソッド
+        """
         res = self.subscribeUma()
         await ctx.send(res)
+
+    @commands.command()
+    async def start(self, ctx):
+        """
+        ウマ娘公式ツイートのデータを取得する
+        """
+        # client = discord.on_message(message)
+
+        if self.user_id in admin_id:
+            await ctx.send('ウマ娘公式ツイート取得定期実行を開始します\n')
+            #1時間毎のjob実行を登録
+            schedule.every(1).hours.do(self.startSchedule)
+
+            while True:
+                # 50秒ごとに実行をペンディングする
+                schedule.run_pending()
+                await asyncio.sleep(30)
+        else:
+            await ctx.send('管理者以外からの実行はできません')
+
+    @commands.command()
+    async def stop(self, ctx):
+        """
+        ウマ娘公式ツイートデータ取得処理を止める
+        """
+        if self.user_id in admin_id:
+            os.kill(os.getpid(), signal.SIGTERM)
+            await ctx.send('ウマ娘公式ツイート取得定期実行を停止します\n')
+        else:
+            await ctx.send('管理者以外からの実行はできません')
+
+
+
 
 
 bot = commands.Bot(command_prefix=prefix,
