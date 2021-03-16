@@ -1,9 +1,6 @@
-import asyncio
-from discord.ext import commands
+from discord.ext import commands, tasks
 from config import token
 from umafunc import uma_tweet
-import schedule
-import os, signal, time
 
 UMA = token.UMA_MUSU_TWITTERID
 TOKEN = token.DISCORD_TOKEN
@@ -25,21 +22,23 @@ class Uma(commands.Cog):
         super().__init__()
         self.bot = bot
 
-    def subscribeUma(self):
+    @commands.command()
+    async def subscribeUma(self, ctx):
         """
         ウマ娘公式のツイートを監視する
         """
         twitter = uma_tweet.GetTweet(bearer=BEARER, uma=UMA)
         uma_tweets = twitter.get_uma_twi(limit='10')
         res = "\n".join(uma_tweets)
-        return res
+        if res:
+            await ctx.send(res)
 
+    @tasks.loop(minutes=15)
     async def startSchedule(self, ctx):
         """
         スケジュール実行されるメソッド
         """
-        res = self.subscribeUma()
-        await ctx.send(res)
+        await self.subscribeUma(ctx)
 
     @commands.command()
     async def start(self, ctx):
@@ -51,12 +50,7 @@ class Uma(commands.Cog):
         if str(user_id) in admin_id:
             await ctx.send('ウマ娘公式ツイート取得定期実行を開始します\n')
             #1時間毎のjob実行を登録
-            schedule.every(1).hours.do(self.startSchedule)
-
-            while True:
-                # 50秒ごとに実行をペンディングする
-                schedule.run_pending()
-                await asyncio.sleep(30)
+            self.startSchedule.start(ctx)
         else:
             await ctx.send('管理者以外からの実行はできません')
 
@@ -67,7 +61,7 @@ class Uma(commands.Cog):
         """
         user_id = ctx.message.author.id
         if str(user_id) in admin_id:
-            os.kill(os.getpid(), signal.SIGTERM)
+            self.startSchedule.cancel()
             await ctx.send('ウマ娘公式ツイート取得定期実行を停止します\n')
         else:
             await ctx.send('管理者以外からの実行はできません')
