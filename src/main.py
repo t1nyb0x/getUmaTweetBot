@@ -71,5 +71,4 @@ class Uma(commands.Cog):
 bot = commands.Bot(command_prefix=prefix,
                    help_command=HelpCommand())
 bot.add_cog(Uma(bot=bot))
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 bot.run(TOKEN)
