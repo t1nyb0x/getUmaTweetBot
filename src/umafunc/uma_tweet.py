@@ -17,7 +17,7 @@ class GetTweet():
             str(self.uma_twi_id) + '%20' + self.hash_tag + \
             '&tweet.fields=created_at&max_results='
         self.headers = {'Authorization': '{}'.format(self.bearer)}
-        self.json_path = 'tweetdata/previous_data.json'
+        self.json_path = './tweetdata/previous_data.json'
 
     def get_uma_twi(self, limit: str):
         """
