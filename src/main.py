@@ -1,4 +1,5 @@
 import os
+from discord import client
 from discord.ext import commands, tasks
 from config import token
 from umafunc import uma_tweet
@@ -41,6 +42,11 @@ class Uma(commands.Cog):
         """
         await self.subscribeUma(ctx)
 
+    @startSchedule.error
+    async def startScheduleError(self, ctx, error):
+        if isinstance(error, commands.BadArgument):
+            await client.get_guild(token.DISCORD_SERVER_ID).get_channel(token.OFFICIAL_TWITTER_SEND_ROOM).send(f"ごめんなさい、startScheduleメソッドで、エラーが起きちゃったみたい\n")
+
     @commands.command()
     async def start(self, ctx):
         """
@@ -66,6 +72,11 @@ class Uma(commands.Cog):
             await ctx.send('ウマ娘公式ツイート取得定期実行を停止します\n')
         else:
             await ctx.send('管理者以外からの実行はできません')
+
+    @commands.Cog.listener()
+    async def on_ready(self, ctx):
+        await client.get_guild(token.DISCORD_SERVER_ID).get_channel(token.OFFICIAL_TWITTER_SEND_ROOM).send('ウマ娘公式ツイート取得定期実行を開始します\n')
+        self.startSchedule.start(ctx)
 
 
 bot = commands.Bot(command_prefix=prefix,
