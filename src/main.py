@@ -73,10 +73,10 @@ class Uma(commands.Cog):
         else:
             await ctx.send('管理者以外からの実行はできません')
 
-    @commands.Cog.listener()
-    async def on_ready(self, ctx):
-        await client.get_guild(token.DISCORD_SERVER_ID).get_channel(token.OFFICIAL_TWITTER_SEND_ROOM).send('ウマ娘公式ツイート取得定期実行を開始します\n')
-        self.startSchedule.start(ctx)
+    # @commands.Cog.listener()
+    # async def on_ready(self, ctx):
+    #     await client.get_guild(token.DISCORD_SERVER_ID).get_channel(token.OFFICIAL_TWITTER_SEND_ROOM).send('ウマ娘公式ツイート取得定期実行を開始します\n')
+    #     self.startSchedule.start(ctx)
 
 
 bot = commands.Bot(command_prefix=prefix,
